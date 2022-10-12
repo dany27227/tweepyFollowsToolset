@@ -7,12 +7,14 @@ from collections import Counter
 from utils import authKeys, followsIO, ncr
 
 # SETTINGS
-CORES = 8
+CORES = 15
 PROG_PERCENT = 10
+MAX_BATCH = 3000000
 MIN_AVGPER = 0.15
 MIN_LENGTH = 4
 MIN_RATIO = 0.33333333
-USER_MODE = True
+LOG = False
+USER_MODE = False
 LIVE_LOADED = False
 LIST_MODE = False
 
@@ -67,7 +69,7 @@ def crunch(payload):
             avgper = (per1 + per2) / 2
 
             if avgper > MIN_AVGPER:
-                if not any([LIST_MODE, USER_MODE]):
+                if LOG:
                     print(f'{pair[0]}: {len1}//////{pair[1]}: {len2}')
                     print(f'matches: {lenm}', f'avgper: {avgper:.0%}', f'ratio: {ratio}')
                     print('')
@@ -95,7 +97,7 @@ if __name__ == '__main__':
             userList = ['DUMMY_USER']
             for filename in os.listdir("usr/"):
                 if filename.endswith(".txt"):
-                    existingLists.append(filename)
+                    existingLists.append(os.path.splitext(filename)[0])
 
         for username in userList:
 
@@ -117,7 +119,7 @@ if __name__ == '__main__':
             combos = []
             coreCombos = []
             totalCombos = ncr.ncr(len(existingLists), 2)
-            BATCH_SIZE = min(totalCombos // (PROG_PERCENT * CORES), 200000)
+            BATCH_SIZE = min(totalCombos // (PROG_PERCENT * CORES), MAX_BATCH)
             completedCombos = 0
 
             for user, user2 in it.combinations(existingLists, 2):
@@ -149,11 +151,14 @@ if __name__ == '__main__':
                 for count in newCounts:
                     mainCounter.update(count)
 
-            for userid, repCount in mainCounter.most_common(11):
+            for userid, repCount in mainCounter.most_common(51):
                 try:
-                    user = api.get_user(user_id=userid)
-                    screenname = user.screen_name
-                    formattedCount = screenname + ' ' + str(repCount)
+                    if USER_MODE or LIST_MODE:
+                        user = api.get_user(user_id=userid)
+                        screenname = user.screen_name
+                        formattedCount = screenname + ' ' + str(repCount)
+                    else:
+                        formattedCount = userid + ' ' + str(repCount)
                 except tw.TweepyException as e:
                     missRatio = repCount / totalCombos
                     missPourcent = f'{missRatio:.2%}'
