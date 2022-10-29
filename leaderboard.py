@@ -9,7 +9,7 @@ if __name__ == '__main__':
 
     def main():
         api = tw.API(authKeys.liveHandler(), wait_on_rate_limit=True)
-        leaderboardRun(api)
+        leaderboardRun(api, user='Thesixler')
 
 
 def leaderboardRun(api, user=''):
@@ -24,10 +24,10 @@ def leaderboardRun(api, user=''):
                 flist = followsIO.loadFollows(mode='ids', file=uid)
                 for entry in flist:
                     lists.append(entry)
-                    continue
-                x = x + 1
+                if len(flist) > 0:
+                    x = x + 1
             except:
-                x = x
+                continue
         print(str(x)+'/'+str(len(userList))+' Found')
 
     else:
@@ -42,7 +42,7 @@ def leaderboardRun(api, user=''):
 
     print('Total aggregated follows: ' + str(len(lists)))
 
-    counts = Counter(lists).most_common(50)
+    counts = Counter(lists).most_common(20)
 
     for entry in counts:
         try:

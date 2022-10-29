@@ -11,6 +11,7 @@ if __name__ == '__main__':
     GET_FOLLOW_TREE = True
     MAX_FRIENDS_COUNT = 60000
     MIN_DIFFERENCE = 15
+    DIFF_CHECK = False
 
     userList = ['sidefx']
     for user in userList:
@@ -60,6 +61,13 @@ if __name__ == '__main__':
         if GET_FOLLOW_TREE:
             for follow in follows:
 
+                exists = existingIDLists.__contains__(str(follow) + '.txt')
+
+                if not DIFF_CHECK:
+                    if exists:
+                        x = x + 1
+                        continue
+
                 try:
                     follow_user = api.get_user(user_id=follow)
                     friends_count = follow_user.friends_count
@@ -69,7 +77,7 @@ if __name__ == '__main__':
                     print(e)
 
                 if friends_count < MAX_FRIENDS_COUNT:
-                    if not existingIDLists.__contains__(str(follow) + '.txt'):
+                    if not exists:
                         follows_sub = []
                         print(screen_name + ' not found')
                         x = x + 1
