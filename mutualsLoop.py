@@ -5,16 +5,17 @@ import multiprocess as mp
 from collections import Counter
 
 from utils import authKeys, followsIO, ncr
+from utils.highscore import highscore
 
 # SETTINGS
-CORES = 15
+CORES = 13
 PROG_PERCENT = 10
-MAX_BATCH = 3000000
+MAX_BATCH = 1000000
 MIN_AVGPER = 0.15
 MIN_LENGTH = 4
 MIN_RATIO = 0.33333333
 LOG = False
-USER_MODE = False
+USER_MODE = True
 LIVE_LOADED = False
 LIST_MODE = False
 
@@ -23,6 +24,7 @@ def crunch(payload):
     existingLists = []
     loadedUsers = []
     counter = Counter()
+    hs = highscore()
 
     if USER_MODE or LIST_MODE:
         loadMode = 'ids'
@@ -75,7 +77,9 @@ def crunch(payload):
                     print('')
                 counter.update({pair[0]: 1})
                 counter.update({pair[1]: 1})
-    return counter
+                hs.update(f'{pair[0]}/{pair[1]}', avgper)
+
+    return counter, hs
 
 if __name__ == '__main__':
 
@@ -87,9 +91,10 @@ if __name__ == '__main__':
         loadedUsers = []
         set1 = []
         mainCounter = Counter()
+        mainHighScore = highscore()
 
         if USER_MODE:
-            userList = ['sidefx']
+            userList = ['DanTheFilmmaker']
         elif LIST_MODE:
             listID = '199358900'
             userList = ['DUMMY_USER']
@@ -130,12 +135,18 @@ if __name__ == '__main__':
                     coreCombos = []
                     if len(combos) == CORES:
                         if CORES == 1:
-                            newCounts = crunch(combos[0])
+                            newCounts, hs = crunch(combos[0])
                             mainCounter.update(newCounts)
+
+                            for name, score in sorted(hs.highscores.items(), key=lambda x: x[1], reverse=True):
+                                mainHighScore.update(name, score)
                         else:
                             newCounts = pool.map(crunch, combos)
                             for count in newCounts:
-                                mainCounter.update(count)
+                                mainCounter.update(count[0])
+
+                                for name, score in sorted(count[1].highscores.items(), key=lambda x: x[1], reverse=True):
+                                    mainHighScore.update(name, score)
 
                         completedCombos += BATCH_SIZE * CORES
                         print(f'{completedCombos / totalCombos:.2%}')
@@ -144,13 +155,20 @@ if __name__ == '__main__':
             # Last remainder run
             combos.append(coreCombos)
             if CORES == 1:
-                newCounts = crunch(combos[0])
+                newCounts, hs = crunch(combos[0])
                 mainCounter.update(newCounts)
+
+                for name, score in sorted(hs.highscores.items(), key=lambda x: x[1], reverse=True):
+                    mainHighScore.update(name, score)
             else:
                 newCounts = pool.map(crunch, combos)
                 for count in newCounts:
-                    mainCounter.update(count)
+                    mainCounter.update(count[0])
 
+                    for name, score in sorted(count[1].highscores.items(), key=lambda x: x[1], reverse=True):
+                        mainHighScore.update(name, score)
+
+            print(mainHighScore)
             for userid, repCount in mainCounter.most_common(51):
                 try:
                     if USER_MODE or LIST_MODE:
@@ -162,7 +180,7 @@ if __name__ == '__main__':
                 except tw.TweepyException as e:
                     missRatio = repCount / totalCombos
                     missPourcent = f'{missRatio:.2%}'
-                    formattedCount = userid + ' ' + missPourcent
+                    formattedCount = userid + ' ' + str(missPourcent)
                 print(formattedCount)
 
             print('')
