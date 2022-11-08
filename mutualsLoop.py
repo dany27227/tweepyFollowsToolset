@@ -8,7 +8,7 @@ from utils import authKeys, followsIO, ncr
 from utils.highscore import highscore
 
 # SETTINGS
-CORES = 13
+CORES = 8
 PROG_PERCENT = 10
 MAX_BATCH = 1000000
 MIN_AVGPER = 0.15
@@ -93,8 +93,8 @@ if __name__ == '__main__':
         mainCounter = Counter()
         mainHighScore = highscore()
 
-        if USER_MODE:
-            userList = ['DanTheFilmmaker']
+        if USER_MODE:  # Nested array will combine lists
+            userList = ['kanyewest', ['kanyewest', 'leeunkrich']]
         elif LIST_MODE:
             listID = '199358900'
             userList = ['DUMMY_USER']
@@ -115,7 +115,12 @@ if __name__ == '__main__':
                 for member in tw.Cursor(api.get_list_members, list_id=listID).items():
                     existingLists.append(member.id)
             elif USER_MODE:
-                existingLists = followsIO.loadFollows(mode='usr', file=username)
+                if type(username).__name__ == 'list':
+                    existingLists = set()
+                    for profile in username:
+                        existingLists = existingLists.union(followsIO.loadFollows(mode='usr', file=profile))
+                else:
+                    existingLists = followsIO.loadFollows(mode='usr', file=username)
                 print(username, len(existingLists))
 
             # Main Processing
@@ -169,7 +174,7 @@ if __name__ == '__main__':
                         mainHighScore.update(name, score)
 
             print(mainHighScore)
-            for userid, repCount in mainCounter.most_common(51):
+            for userid, repCount in mainCounter.most_common(11):
                 try:
                     if USER_MODE or LIST_MODE:
                         user = api.get_user(user_id=userid)
@@ -186,6 +191,7 @@ if __name__ == '__main__':
             print('')
             existingLists = []
             mainCounter.clear()
+            mainHighScore = highscore()
 
     main()
 
