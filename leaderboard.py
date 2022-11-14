@@ -9,15 +9,29 @@ if __name__ == '__main__':
 
     def main():
         api = tw.API(authKeys.liveHandler(), wait_on_rate_limit=True)
-        leaderboardRun(api, user='Thesixler')
+        leaderboardRun(api, user='leighalexander')
 
 
-def leaderboardRun(api, user=''):
+def leaderboardRun(api, user='', listID=''):
 
     lists = []
     x = 0
 
-    if user != '':
+    if listID != '':
+        listMembers = []
+        for member in tw.Cursor(api.get_list_members, list_id=listID).items():
+            listMembers.append(member.id)
+        for member in listMembers:
+            try:
+                flist = followsIO.loadFollows(mode='ids', file=member)
+                for entry in flist:
+                    lists.append(entry)
+                if len(flist) > 0:
+                    x = x + 1
+            except:
+                continue
+        print(str(x) + '/' + str(len(listMembers)) + ' Found')
+    elif user != '':
         userList = followsIO.loadFollows(mode='usr', file=user)
         for uid in userList:
             try:
