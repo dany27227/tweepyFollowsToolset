@@ -8,12 +8,12 @@ from utils import authKeys, followsIO, ncr
 from utils.highscore import highscore
 
 # SETTINGS
-CORES = 8
+CORES = 13
 PROG_PERCENT = 10
-MAX_BATCH = 1000000
-MIN_AVGPER = 0.15
+MAX_BATCH = 2750000
+MIN_AVGPER = 0.14
 MIN_LENGTH = 4
-MIN_RATIO = 0.33333333
+MIN_RATIO = 0.33
 LOG = False
 USER_MODE = True
 LIVE_LOADED = False
@@ -94,7 +94,7 @@ if __name__ == '__main__':
         mainHighScore = highscore()
 
         if USER_MODE:  # Nested array will combine lists
-            userList = ['kanyewest', ['kanyewest', 'leeunkrich']]
+            userList = [['AriMelber', 'DanTheFilmmaker', 'HZAb0t', 'Popdust', 'RDupeyras', 'Toure', 'TyrelAlejandro', 'VanLathan']]
         elif LIST_MODE:
             listID = '199358900'
             userList = ['DUMMY_USER']
@@ -174,7 +174,7 @@ if __name__ == '__main__':
                         mainHighScore.update(name, score)
 
             print(mainHighScore)
-            for userid, repCount in mainCounter.most_common(11):
+            for userid, repCount in mainCounter.most_common(70):
                 try:
                     if USER_MODE or LIST_MODE:
                         user = api.get_user(user_id=userid)
@@ -185,7 +185,7 @@ if __name__ == '__main__':
                 except tw.TweepyException as e:
                     missRatio = repCount / totalCombos
                     missPourcent = f'{missRatio:.2%}'
-                    formattedCount = userid + ' ' + str(missPourcent)
+                    formattedCount = str(userid) + ' ' + str(missPourcent)
                 print(formattedCount)
 
             print('')
