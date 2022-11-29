@@ -9,12 +9,12 @@ if __name__ == '__main__':
 
     # SETTINGS
     GET_FOLLOW_TREE = True
-    MAX_FRIENDS_COUNT = 100000
-    MIN_DIFFERENCE = 2
-    DIFF_CHECK = True
-    LIST_MODE = True
+    MAX_FRIENDS_COUNT = 250000
+    MIN_DIFFERENCE = 10
+    DIFF_CHECK = False
+    LIST_MODE = False
 
-    userList = ['sidefx']
+    userList = ['Toure']
     listIDs = ['199358900']
 
     if LIST_MODE:
@@ -67,7 +67,7 @@ if __name__ == '__main__':
                         followsIO.writeFollows('ids', member, follows_sub)
 
                     else:
-                        sub_follows = followsIO.loadFollows(mode='ids', file=member)
+                        sub_follows = followsIO.loadFollows(mode='ids', name=member)
                         x = x + 1
 
                         if abs(friends_count - len(sub_follows)) > MIN_DIFFERENCE:
@@ -121,7 +121,7 @@ if __name__ == '__main__':
                 followsIO.writeFollows('usr', user, follows)
                 followsIO.writeFollows('ids', userID, follows)
             else:
-                follows = followsIO.loadFollows(mode='usr', file=user)
+                follows = followsIO.loadFollows(mode='usr', name=user)
 
                 if abs(friends_count - len(follows)) > MIN_DIFFERENCE:
                     follows = []
@@ -167,7 +167,7 @@ if __name__ == '__main__':
                             followsIO.writeFollows('ids', follow, follows_sub)
 
                         else:
-                            sub_follows = followsIO.loadFollows(mode='ids', file=follow)
+                            sub_follows = followsIO.loadFollows(mode='ids', name=follow)
                             x = x + 1
 
                             if abs(friends_count - len(sub_follows)) > MIN_DIFFERENCE:

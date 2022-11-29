@@ -10,7 +10,7 @@ from utils.highscore import highscore
 # SETTINGS
 CORES = 13
 PROG_PERCENT = 10
-MAX_BATCH = 2750000
+MAX_BATCH = 1750000
 MIN_AVGPER = 0.14
 MIN_LENGTH = 4
 MIN_RATIO = 0.33
@@ -34,10 +34,10 @@ def crunch(payload):
     for pair in payload:
 
         if not loadedUsers.__contains__(pair[0]):
-            array1 = followsIO.loadFollows(mode=loadMode, file=pair[0])
+            array1 = followsIO.loadFollows(mode=loadMode, name=pair[0])
             loadedUsers.append(pair[0])
 
-        array2 = followsIO.loadFollows(mode=loadMode, file=pair[1])
+        array2 = followsIO.loadFollows(mode=loadMode, name=pair[1])
 
         len1 = len(array1)
         len2 = len(array2)
@@ -94,7 +94,7 @@ if __name__ == '__main__':
         mainHighScore = highscore()
 
         if USER_MODE:  # Nested array will combine lists
-            userList = [['AriMelber', 'DanTheFilmmaker', 'HZAb0t', 'Popdust', 'RDupeyras', 'Toure', 'TyrelAlejandro', 'VanLathan']]
+            userList = [['kanyewest', 'kendricklamar']]
         elif LIST_MODE:
             listID = '199358900'
             userList = ['DUMMY_USER']
@@ -115,12 +115,7 @@ if __name__ == '__main__':
                 for member in tw.Cursor(api.get_list_members, list_id=listID).items():
                     existingLists.append(member.id)
             elif USER_MODE:
-                if type(username).__name__ == 'list':
-                    existingLists = set()
-                    for profile in username:
-                        existingLists = existingLists.union(followsIO.loadFollows(mode='usr', file=profile))
-                else:
-                    existingLists = followsIO.loadFollows(mode='usr', file=username)
+                existingLists = followsIO.loadFollows(mode='usr', name=username)
                 print(username, len(existingLists))
 
             # Main Processing

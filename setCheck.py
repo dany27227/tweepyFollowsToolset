@@ -9,7 +9,7 @@ if __name__ == '__main__':
 
         api = tw.API(authKeys.liveHandler(), wait_on_rate_limit=True)
 
-        userList = ['sidefx', 'LupeFiasco', 'Thesixler']
+        userList = ['JuddApatow', 'ManMadeMoon', 'WHOISCONWAY']
         idList = []
 
         existingLists = []
@@ -24,7 +24,7 @@ if __name__ == '__main__':
         idSet = set(idList)
 
         for followListFile in existingLists:
-            userSet = followsIO.loadFollows(mode='usr', file=followListFile)
+            userSet = followsIO.loadFollows(mode='usr', name=followListFile)
 
             matches = idSet.intersection(userSet)
 
