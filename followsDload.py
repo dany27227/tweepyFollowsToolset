@@ -9,12 +9,12 @@ if __name__ == '__main__':
 
     # SETTINGS
     GET_FOLLOW_TREE = True
-    MAX_FRIENDS_COUNT = 250000
+    MAX_FRIENDS_COUNT = 74000
     MIN_DIFFERENCE = 10
-    DIFF_CHECK = False
+    DIFF_CHECK = True
     LIST_MODE = False
 
-    userList = ['Toure']
+    userList = ['DanTheFilmmaker']
     listIDs = ['199358900']
 
     if LIST_MODE:
@@ -180,6 +180,33 @@ if __name__ == '__main__':
                                         follows_sub += cursor
                                 except tw.TweepyException as e:
                                     print(e)
+
+                                removed = sub_follows.difference(follows_sub)
+                                added = set(follows_sub).difference(sub_follows)
+
+                                print('______')
+                                print('Removed:')
+                                if len(removed) <= 30:
+                                    for removed_user in removed:
+                                        try:
+                                            userID = api.get_user(user_id=removed_user)
+                                            print(userID.screen_name + ' / ' + userID.name)
+                                        except tw.TweepyException as e:
+                                            print('Error')
+                                else:
+                                    print('skipping removed because too many')
+
+                                print('Added:')
+                                if len(added) <= 30:
+                                    for added_user in added:
+                                        try:
+                                            userID = api.get_user(user_id=added_user)
+                                            print(userID.screen_name + ' / ' + userID.name)
+                                        except tw.TweepyException as e:
+                                            print('Error')
+                                else:
+                                    print('skipping added because too many')
+                                print('______')
 
                                 followsIO.writeFollows('usr', screen_name, follows_sub)
                                 followsIO.writeFollows('ids', follow, follows_sub)
