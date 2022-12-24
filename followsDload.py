@@ -5,16 +5,16 @@ from utils import authKeys, followsIO
 
 if __name__ == '__main__':
 
-    api = tw.API(authKeys.liveHandler(), wait_on_rate_limit=True)
+    api = tw.API(authKeys.liveHandler(), wait_on_rate_limit=True, follows_remainder=3)
 
     # SETTINGS
     GET_FOLLOW_TREE = True
-    MAX_FRIENDS_COUNT = 74000
-    MIN_DIFFERENCE = 10
+    MAX_FRIENDS_COUNT = 149000
+    MIN_DIFFERENCE = 26
     DIFF_CHECK = True
     LIST_MODE = False
 
-    userList = ['DanTheFilmmaker']
+    userList = ['xiu_shoegaze', 'hilevel']
     listIDs = ['199358900']
 
     if LIST_MODE:
@@ -185,25 +185,28 @@ if __name__ == '__main__':
                                 added = set(follows_sub).difference(sub_follows)
 
                                 print('______')
-                                print('Removed:')
-                                if len(removed) <= 30:
+                                print(f'Removed: {len(removed)}')
+                                if len(removed) <= (api.user_remainder / api.divider):
+                                    api.user_remainder = api.user_remainder - len(removed)
                                     for removed_user in removed:
                                         try:
                                             userID = api.get_user(user_id=removed_user)
                                             print(userID.screen_name + ' / ' + userID.name)
                                         except tw.TweepyException as e:
-                                            print('Error')
+                                            continue
                                 else:
                                     print('skipping removed because too many')
 
-                                print('Added:')
-                                if len(added) <= 30:
+                                print('______')
+                                print(f'Added: {len(added)}')
+                                if len(added) <= (api.user_remainder / api.divider):
+                                    api.user_remainder = api.user_remainder - len(added)
                                     for added_user in added:
                                         try:
                                             userID = api.get_user(user_id=added_user)
                                             print(userID.screen_name + ' / ' + userID.name)
                                         except tw.TweepyException as e:
-                                            print('Error')
+                                            continue
                                 else:
                                     print('skipping added because too many')
                                 print('______')
