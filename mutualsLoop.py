@@ -36,7 +36,6 @@ def createWorkers(index, fullIterator, totalCombos):
     counter = Counter()
     hs = highscore()
     ownHs = highscore()
-    WTListHs = highscore()
 
     indices = []
     for i in range(index, math.ceil(totalCombos / sizeOfChunk), CORES):
