@@ -3,13 +3,13 @@ import tweepy as tw
 import pickle
 from collections import Counter
 
-from utils import authKeys, followsIO
+from utils import authKeys, followsIO, idConvert
 
 if __name__ == '__main__':
 
     def main():
         api = tw.API(authKeys.liveHandler(), wait_on_rate_limit=True)
-        leaderboardRun(api)
+        leaderboardRun(api, user=['davidscottjaffe'])
 
 
 def leaderboardRun(api, user='', listID='', listLevelTwo=False):  # If not given a user/list will add up all profiles
@@ -49,7 +49,7 @@ def leaderboardRun(api, user='', listID='', listLevelTwo=False):  # If not given
                     x = x + 1
             except:
                 continue
-        print(user+': '+str(x)+'/'+str(len(userList))+' Found')
+        print(str(user)+': '+str(x)+'/'+str(len(userList))+' Found')
 
     else:
         for filename in os.listdir("usr/"):
@@ -63,14 +63,10 @@ def leaderboardRun(api, user='', listID='', listLevelTwo=False):  # If not given
 
     print('Total aggregated follows: ' + str(len(lists)))
 
-    counts = Counter(lists).most_common(60)
+    counts = Counter(lists).most_common(25)
 
     for entry in counts:
-        try:
-            id = entry[0]
-            user = api.get_user(user_id=id)
-            print(user.screen_name+': '+str(entry[1]))
-        except tw.TweepyException as e:
-            print(e)
+        print(idConvert.convert(api, entry[0]) + ': ' + str(entry[1]))
+
 
 main()

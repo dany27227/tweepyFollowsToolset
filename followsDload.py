@@ -1,20 +1,20 @@
 import os
 import tweepy as tw
 
-from utils import authKeys, followsIO
+from utils import authKeys, followsIO, idConvert
 
 if __name__ == '__main__':
 
-    api = tw.API(authKeys.liveHandler(), wait_on_rate_limit=True, follows_remainder=3)
+    api = tw.API(authKeys.liveHandler(), wait_on_rate_limit=True)
 
     # SETTINGS
-    GET_FOLLOW_TREE = True
+    GET_FOLLOW_TREE = False
     MAX_FRIENDS_COUNT = 149000
-    MIN_DIFFERENCE = 26
-    DIFF_CHECK = True
+    MIN_DIFFERENCE = -1
+    DIFF_CHECK = False
     LIST_MODE = False
 
-    userList = ['xiu_shoegaze', 'hilevel']
+    userList = ['BIGBABYGANDHI']
     listIDs = ['199358900']
 
     if LIST_MODE:
@@ -189,11 +189,7 @@ if __name__ == '__main__':
                                 if len(removed) <= (api.user_remainder / api.divider):
                                     api.user_remainder = api.user_remainder - len(removed)
                                     for removed_user in removed:
-                                        try:
-                                            userID = api.get_user(user_id=removed_user)
-                                            print(userID.screen_name + ' / ' + userID.name)
-                                        except tw.TweepyException as e:
-                                            continue
+                                        print(idConvert.convert(api, removed_user))
                                 else:
                                     print('skipping removed because too many')
 
@@ -202,11 +198,7 @@ if __name__ == '__main__':
                                 if len(added) <= (api.user_remainder / api.divider):
                                     api.user_remainder = api.user_remainder - len(added)
                                     for added_user in added:
-                                        try:
-                                            userID = api.get_user(user_id=added_user)
-                                            print(userID.screen_name + ' / ' + userID.name)
-                                        except tw.TweepyException as e:
-                                            continue
+                                        print(idConvert.convert(api, added_user))
                                 else:
                                     print('skipping added because too many')
                                 print('______')

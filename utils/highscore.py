@@ -10,7 +10,7 @@ class highscore:
     def update(self, name, score):
         self.highscores[name] = score
         self.highscores = {n: s for n, s in self.highscores.items()
-                           if s in sorted(self.highscores.values(), reverse=True)[:30]}
+                           if s in sorted(self.highscores.values(), reverse=True)[:50]}
 
     def __str__(self):
         return '\n'.join(
@@ -24,11 +24,14 @@ class highscore:
         names = []
 
         for id in ids:
-            try:
-                user = self.api.get_user(user_id=id)
-                screenname = user.screen_name
-                names.append(screenname)
-            except:
-                names.append('not found')
+            if id.isnumeric():
+                try:
+                    user = self.api.get_user(user_id=id)
+                    screenname = user.screen_name
+                    names.append(screenname)
+                except:
+                    names.append('not found')
+            else:
+                names.append(id)
 
         return names

@@ -1,12 +1,12 @@
 import tweepy as tw
 
-from utils import authKeys, followsIO
+from utils import authKeys, followsIO, idConvert
 
 if __name__ == '__main__':
 
-    api = tw.API(authKeys.liveHandler())
+    api = tw.API(authKeys.liveHandler(), wait_on_rate_limit=True)
 
-    users = ['DanTheFilmmaker', 'kendricklamar']
+    users = ['BIGBABYGANDHI', 'verge']
 
     for x in range(len(users) - 1):
         if x == 0:
@@ -24,9 +24,7 @@ if __name__ == '__main__':
     print(headerString)
     print('')
     print('Matches: ' + str(len(matches)))
+
     for match in matches:
-        try:
-            userID = api.get_user(user_id=match)
-            print(userID.screen_name+' / '+userID.name)
-        except tw.TweepyException as e:
-            print('Error')
+        print(idConvert.convert(api, match))
+
