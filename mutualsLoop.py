@@ -10,7 +10,7 @@ from collections import Counter
 import progressbar
 import pickle
 
-from utils import authKeys, followsIO, ncr
+from utils import authKeys, followsIO, ncr, idConvert
 from utils.highscore import highscore
 
 # SETTINGS
@@ -30,7 +30,7 @@ def createWorkers(index, fullIterator, totalCombos):
 
     nestedPool = mp.Pool(processes=SUB_CORES)
 
-    sizeOfChunk = 10000
+    sizeOfChunk = 50000
     splitCombinations = mit.ichunked(fullIterator, sizeOfChunk)
 
     counter = Counter()
@@ -174,7 +174,7 @@ if __name__ == '__main__':
         mainOwnScore = highscore()
 
         if USER_MODE:  # Nested array will combine lists
-            userList = [['kendricklamar', 'kanyewest']]
+            userList = [['M83']]
         elif LIST_MODE:
             userList = ['DUMMY_USER']
             listID = '199358900'
@@ -230,23 +230,22 @@ if __name__ == '__main__':
                 for name, score in loadedScore2.highscores.items():
                     mainOwnScore.update(name, score)
 
-            with open("mainhs.txt", "w") as text_file:
+            with open("mainhs.txt", "w", encoding="utf-8") as text_file:
                 text_file.write(str(mainHighScore))
-            with open("ownhs.txt", "w") as text_file:
+            with open("ownhs.txt", "w", encoding="utf-8") as text_file:
                 text_file.write(str(mainOwnScore))
                 
             for userid, repCount in mainCounter.most_common(50):
-                try:
-                    if USER_MODE or LIST_MODE:
-                        user = api.get_user(user_id=userid)
-                        screenname = user.screen_name
-                        formattedCount = screenname + ' ' + str(repCount)
-                    else:
-                        formattedCount = userid + ' ' + str(repCount)
-                except tw.TweepyException as e:
+                if userid == 'empty':
                     missRatio = repCount / totalCombos
                     missPercent = f'{missRatio:.2%}'
-                    formattedCount = str(userid) + ' ' + str(missPercent)
+                    formattedCount = 'Empty Pairs // ' + str(missPercent)
+                else:
+                    if USER_MODE or LIST_MODE:
+                        formattedCount = idConvert.convert(api, userid) + ' // ' + str(repCount)
+                    else:
+                        formattedCount = userid + ' // ' + str(repCount)
+
                 print(formattedCount)
 
             print('')
