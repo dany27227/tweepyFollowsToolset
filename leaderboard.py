@@ -1,6 +1,5 @@
 import os
 import tweepy as tw
-import pickle
 from collections import Counter
 
 from utils import authKeys, followsIO, idConvert
@@ -9,10 +8,11 @@ if __name__ == '__main__':
 
     def main():
         api = tw.API(authKeys.liveHandler(), wait_on_rate_limit=True)
-        leaderboardRun(api, user=['davidscottjaffe'])
+        leaderboardRun(api, user=['JordanPeele'])
+        # leaderboardRun(api)
 
 
-def leaderboardRun(api, user='', listID='', listLevelTwo=False):  # If not given a user/list will add up all profiles
+def leaderboardRun(api, user='', listID='', output=30, listLevelTwo=False):  # If not given a user/list will add up all profiles
 
     lists = []
     x = 0
@@ -58,15 +58,17 @@ def leaderboardRun(api, user='', listID='', listLevelTwo=False):  # If not given
                 for entry in flist:
                     lists.append(entry)
                     continue
+                x += 1
             else:
                 continue
 
     print('Total aggregated follows: ' + str(len(lists)))
 
-    counts = Counter(lists).most_common(25)
+    counts = Counter(lists).most_common(output)
 
     for entry in counts:
-        print(idConvert.convert(api, entry[0]) + ': ' + str(entry[1]))
+        percentage = f'{(entry[1] / x):.2%}'
+        print(idConvert.convert(api, entry[0]) + ': ' + str(entry[1]) + ' / ' + percentage)
 
 
 main()
