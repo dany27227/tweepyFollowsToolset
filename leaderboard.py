@@ -15,7 +15,7 @@ if __name__ == '__main__':
 def leaderboardRun(api, user='', listID='', output=30, listLevelTwo=False):  # If not given a user/list will add up all profiles
 
     lists = []
-    x = 0
+    nonEmpty = 0
 
     if listID != '':
         listMembers = []
@@ -33,10 +33,10 @@ def leaderboardRun(api, user='', listID='', output=30, listLevelTwo=False):  # I
                     for entryL2 in flistL2:
                         lists.append(entryL2)
                     if len(flistL2) > 0:
-                        x = x + 1
+                        nonEmpty += 1
             if len(flist) > 0:
-                x = x + 1
-        print(str(x) + '/' + str(totalLoads) + ' Found')
+                nonEmpty += 1
+        print(str(nonEmpty) + '/' + str(totalLoads) + ' Found')
 
     elif user != '':
         userList = followsIO.loadFollows(mode='usr', name=user)
@@ -46,10 +46,10 @@ def leaderboardRun(api, user='', listID='', output=30, listLevelTwo=False):  # I
                 for entry in flist:
                     lists.append(entry)
                 if len(flist) > 0:
-                    x = x + 1
+                    nonEmpty += 1
             except:
                 continue
-        print(str(user)+': '+str(x)+'/'+str(len(userList))+' Found')
+        print(str(user)+': '+str(nonEmpty)+'/'+str(len(userList))+' Found')
 
     else:
         for filename in os.listdir("usr/"):
@@ -58,7 +58,7 @@ def leaderboardRun(api, user='', listID='', output=30, listLevelTwo=False):  # I
                 for entry in flist:
                     lists.append(entry)
                     continue
-                x += 1
+                nonEmpty += 1
             else:
                 continue
 
@@ -67,7 +67,7 @@ def leaderboardRun(api, user='', listID='', output=30, listLevelTwo=False):  # I
     counts = Counter(lists).most_common(output)
 
     for entry in counts:
-        percentage = f'{(entry[1] / x):.2%}'
+        percentage = f'{(entry[1] / nonEmpty):.2%}'
         print(idConvert.convert(api, entry[0]) + ': ' + str(entry[1]) + ' / ' + percentage)
 
 
