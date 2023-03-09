@@ -14,23 +14,19 @@ from utils import authKeys, followsIO, ncr, idConvert
 from utils.highscore import highscore
 
 # SETTINGS
-CORES = 4
-PROG_PERCENT = 10
-MIN_AVGPER = 0.14
-MIN_LENGTH = 4
-MIN_RATIO = 0.33
-LOG = False
+CORES = 2
+MIN_AVGPER = 13.75
 USER_MODE = True
 LIVE_LOADED = False
 LIST_MODE = False
 
 
 def createWorkers(index, fullIterator, totalCombos):
-    SUB_CORES = 4
+    SUB_CORES = 8
 
     nestedPool = mp.Pool(processes=SUB_CORES)
 
-    sizeOfChunk = 50000
+    sizeOfChunk = 5000
     splitCombinations = mit.ichunked(fullIterator, sizeOfChunk)
 
     counter = Counter()
@@ -122,42 +118,19 @@ def crunch(payload):
             counter.update({'empty': 1})
             continue
 
-        if len1 > len2:
-            try:
-                ratio = len2 / len1
-            except:
-                ratio = 0
-        else:
-            try:
-                ratio = len1 / len2
-            except:
-                ratio = 0
+        matches = array1.intersection(array2)
+        lenm = len(matches)
 
-        if len1 > MIN_LENGTH and len2 > MIN_LENGTH and ratio > MIN_RATIO:
-            matches = array1.intersection(array2)
-            lenm = len(matches)
-            try:
-                per1 = lenm / len1
-            except:
-                per1 = 0
-            try:
-                per2 = lenm / len2
-            except:
-                per2 = 0
+        avgper = (lenm / (len1 + len2 - lenm)) * 100
 
-            avgper = (per1 + per2) / 2
+        if avgper > MIN_AVGPER:
+            counter.update({pair[0]: 1})
+            counter.update({pair[1]: 1})
 
-            if avgper > MIN_AVGPER:
-                if LOG:
-                    print(f'{pair[0]}: {len1}//////{pair[1]}: {len2}')
-                    print(f'matches: {lenm}', f'avgper: {avgper:.0%}', f'ratio: {ratio}')
-                    print('')
-                counter.update({pair[0]: 1})
-                counter.update({pair[1]: 1})
-                hs.update(f'{pair[0]}/{pair[1]}', avgper)
+        hs.update(f'{pair[0]}/{pair[1]}', avgper)
 
-            if 'DanTheFilmmaker' in pair:
-                ownHs.update(f'{pair[0]}/{pair[1]}', avgper)
+        if 18824696 in pair:
+            ownHs.update(f'{pair[0]}/{pair[1]}', avgper)
 
     return counter, hs, ownHs
 
@@ -174,7 +147,7 @@ if __name__ == '__main__':
         mainOwnScore = highscore()
 
         if USER_MODE:  # Nested array will combine lists
-            userList = [['M83']]
+            userList = [['DanTheFilmmaker']]
         elif LIST_MODE:
             userList = ['DUMMY_USER']
             listID = '199358900'

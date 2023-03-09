@@ -1,16 +1,17 @@
 import tweepy as tw
-from utils import authKeys
+from utils import authKeys, idConvert
 
 class highscore:
     api = tw.API(authKeys.liveHandler(), wait_on_rate_limit=True)
 
-    def __init__(self):
+    def __init__(self, positions=50):
         self.highscores = {}
+        self.positions = positions
 
     def update(self, name, score):
         self.highscores[name] = score
         self.highscores = {n: s for n, s in self.highscores.items()
-                           if s in sorted(self.highscores.values(), reverse=True)[:50]}
+                           if s in sorted(self.highscores.values(), reverse=True)[:self.positions]}
 
     def __str__(self):
         return '\n'.join(
@@ -26,9 +27,7 @@ class highscore:
         for id in ids:
             if id.isnumeric():
                 try:
-                    user = self.api.get_user(user_id=id)
-                    screenname = user.screen_name
-                    names.append(screenname)
+                    names.append(idConvert.convert(self.api, id, single=True))
                 except:
                     names.append('not found')
             else:

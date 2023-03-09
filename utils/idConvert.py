@@ -10,3 +10,10 @@ def convert(api, userid, single=False):
         return userString
     except tw.TweepyException as e:
         return 'Error'
+
+def getId(api, screenname):
+    try:
+        user = api.get_user(screen_name=screenname)
+        return user.id
+    except tw.TweepyException as e:
+        return 'Error'
