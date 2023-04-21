@@ -7,7 +7,10 @@ def loadFollows(mode, name):
         for file in name:
             newSet = newSet.union(load(mode=mode, file=file))
     else:
-        newSet = load(mode, name)
+        try:
+            newSet = load(mode, name)
+        except:
+            raise
 
     return newSet
 
@@ -16,12 +19,12 @@ def load(mode, file):
     try:
         file = open(f'{mode}/{file}.txt', 'rb')
     except:
-        file = []
+        raise
     try:
         loaded = pickle.load(file)
+        loadedSet = set(loaded)
     except:
-        loaded = []
-    loadedSet = set(loaded)
+        raise
 
     return loadedSet
 

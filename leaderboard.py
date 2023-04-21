@@ -8,67 +8,73 @@ if __name__ == '__main__':
 
     def main():
         api = tw.API(authKeys.liveHandler(), wait_on_rate_limit=True)
-        leaderboardRun(api, user=['JordanPeele'])
+        # leaderboardRun(api, listID=199358900)
         # leaderboardRun(api)
+        leaderboardRun(api, users=['DanTheFilmmaker'], levelTwo=True)
 
+def leaderboardRun(api, users=[], listID='', levelOne=True, levelTwo=False):  # If not given a user/list will add up all profiles
 
-def leaderboardRun(api, user='', listID='', output=30, listLevelTwo=False):  # If not given a user/list will add up all profiles
-
-    lists = []
-    nonEmpty = 0
+    lists = Counter()
+    loads = 0
+    totalLoads = 0
 
     if listID != '':
-        listMembers = []
         for member in tw.Cursor(api.get_list_members, list_id=listID).items():
-            listMembers.append(member.id)
-        totalLoads = len(listMembers)
+            users.append(member.id)
+        loadMode = 'ids'
 
-        for member in listMembers:
-            flist = followsIO.loadFollows(mode='ids', name=member)
-            totalLoads += len(flist)
-            for entry in flist:
-                lists.append(entry)
-                if listLevelTwo:
-                    flistL2 = followsIO.loadFollows(mode='ids', name=entry)
-                    for entryL2 in flistL2:
-                        lists.append(entryL2)
-                    if len(flistL2) > 0:
-                        nonEmpty += 1
-            if len(flist) > 0:
-                nonEmpty += 1
-        print(str(nonEmpty) + '/' + str(totalLoads) + ' Found')
-
-    elif user != '':
-        userList = followsIO.loadFollows(mode='usr', name=user)
-        for uid in userList:
-            try:
-                flist = followsIO.loadFollows(mode='ids', name=uid)
-                for entry in flist:
-                    lists.append(entry)
-                if len(flist) > 0:
-                    nonEmpty += 1
-            except:
-                continue
-        print(str(user)+': '+str(nonEmpty)+'/'+str(len(userList))+' Found')
+    elif users != '':
+        if type(users).__name__ == 'list':
+            loadMode = 'usr'
 
     else:
         for filename in os.listdir("usr/"):
             if filename.endswith(".txt"):
-                flist = followsIO.loadFollows(mode='usr', name=os.path.splitext(filename)[0])
-                for entry in flist:
-                    lists.append(entry)
+                users.append(filename)
+        loadMode = 'usr'
+
+    for name in users:
+        try:
+            userList = followsIO.loadFollows(mode=loadMode, name=name)
+        except:
+            continue
+        loads += 1
+
+        for uid in userList:
+            lists.update({uid: 1})
+
+        if levelOne:
+            for uid in userList:
+                try:
+                    flist = followsIO.loadFollows(mode='ids', name=uid)
+                except:
                     continue
-                nonEmpty += 1
-            else:
-                continue
+                loads += 1
 
-    print('Total aggregated follows: ' + str(len(lists)))
+                for entry in flist:
+                    lists.update({entry: 1})
 
-    counts = Counter(lists).most_common(output)
+                if levelTwo:
+                    for entry in flist:
+                        try:
+                            flistL2 = followsIO.loadFollows(mode='ids', name=entry)
+                        except:
+                            continue
+                        loads += 1
 
-    for entry in counts:
-        percentage = f'{(entry[1] / nonEmpty):.2%}'
+                        for entryL2 in flistL2:
+                            lists.update({entryL2: 1})
+
+                    totalLoads += len(flist)
+            totalLoads += len(userList)
+    totalLoads += len(users)
+
+    print(str(loads) + '/' + str(totalLoads) + ' Found')
+
+    print('Total aggregated follows: ' + str(sum(lists.values())))
+
+    for entry in lists.most_common(34):
+        percentage = f'{(entry[1] / loads):.2%}'
         print(idConvert.convert(api, entry[0]) + ': ' + str(entry[1]) + ' / ' + percentage)
-
 
 main()
